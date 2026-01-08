@@ -3,5 +3,8 @@
   "build": {
     "builder": "dockerfile",
     "dockerfile": "Dockerfile.transcription"
+  },
+  "deploy": {
+    "startCommand": "python transcription-service.py"
   }
 }
