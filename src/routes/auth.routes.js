@@ -98,7 +98,7 @@ router.post('/login', async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: 'lax',
+      sameSite: 'none',
     });
 
     res.json({ token, user: { id: user.user_id, email: user.email, name: user.name } });

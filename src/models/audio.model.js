@@ -1,31 +1,56 @@
 import pool from '../db/index.js';
 
-/* Save audio path for a session */
+/* Save audio and metadata for a session */
 export const attachAudioToSession = async (
   sessionId,
   customerId,
-  audioPath
+  audioPath,
+  audioData = {}
 ) => {
+  const {
+    audioUrl = audioPath,
+    fileSize = null,
+    duration = null,
+    format = 'webm',
+    mimeType = 'audio/webm'
+  } = audioData;
+
   const result = await pool.query(
     `
     UPDATE sessions
-    SET audio_file_path = $1,
+    SET audio_blob_url = $1,
+        audio_file_size = $2,
+        audio_duration = $3,
+        audio_format = $4,
+        audio_mime_type = $5,
+        audio_uploaded_at = now(),
+        status = CASE 
+          WHEN status = 'pending' THEN 'completed'
+          ELSE status
+        END,
         updated_at = now()
-    WHERE session_id = $2
-      AND customer_id = $3
+    WHERE session_id = $6
+      AND customer_id = $7
     RETURNING *;
     `,
-    [audioPath, sessionId, customerId]
+    [audioUrl, fileSize, duration, format, mimeType, sessionId, customerId]
   );
 
   return result.rows[0];
 };
 
-/* Get session audio path */
+/* Get session audio with all metadata */
 export const getSessionAudioPath = async (sessionId, customerId) => {
   const result = await pool.query(
     `
-    SELECT audio_file_path
+    SELECT 
+      audio_file_path,
+      audio_blob_url,
+      audio_file_size,
+      audio_duration,
+      audio_format,
+      audio_mime_type,
+      audio_uploaded_at
     FROM sessions
     WHERE session_id = $1
       AND customer_id = $2;
@@ -49,17 +74,22 @@ export const updateSessionStatus = async (sessionId, status) => {
   );
 };
 
-/* DELETE SESSION AUDIO */
+/* DELETE SESSION AUDIO - Clear all audio metadata */
 export const deleteSessionAudio = async (sessionId, customerId) => {
   const result = await pool.query(
     `
     UPDATE sessions
-    SET audio_file_path = NULL,
+    SET audio_blob_url = NULL,
+        audio_file_size = NULL,
+        audio_duration = NULL,
+        audio_format = NULL,
+        audio_mime_type = NULL,
+        audio_uploaded_at = NULL,
         status = 'pending',
         updated_at = now()
     WHERE session_id = $1
       AND customer_id = $2
-    RETURNING audio_file_path;
+    RETURNING audio_blob_url;
     `,
     [sessionId, customerId]
   );

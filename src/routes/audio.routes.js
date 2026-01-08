@@ -29,20 +29,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// New endpoint for creating session with audio
-const tempStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join('src', 'uploads', 'temp');
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
-});
-
+// Temporary memory storage for Vercel (replace with cloud storage later)
+const tempStorage = multer.memoryStorage();
 const tempUpload = multer({ storage: tempStorage });
 
 router.post('/audio/upload', authenticateToken, tempUpload.single('audio'), createSessionWithAudio);

@@ -11,8 +11,8 @@ import notesRoutes from './routes/notes.routes.js';
 import issuesRoutes from './routes/issues.routes.js';
 import followupsRoutes from './routes/followups.routes.js';
 import authRoutes from './routes/auth.routes.js';
-// In your app.js or server.js
-import './workers/transcription.worker.js';
+// Workers don't work in serverless - comment out for Vercel deployment
+// import './workers/transcription.worker.js';
 
 dotenv.config();
 
@@ -20,7 +20,12 @@ const app = express();
 
 // Enable CORS for frontend communication
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5000', 'https://therapist-portal-front-git-3d1089-prasannanage61-7016s-projects.vercel.app'],
+  origin: [
+    'https://therapist-portal-frontend.vercel.app',
+    'https://mvpfrontend-roan.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3001',
+  ],
   credentials: true,
 }));
 
@@ -41,8 +46,5 @@ app.use(notesRoutes);
 app.use(issuesRoutes);
 app.use(followupsRoutes);
 
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Export app for Vercel serverless deployment
+export default app;

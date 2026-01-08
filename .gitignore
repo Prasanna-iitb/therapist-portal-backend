@@ -1,6 +1,10 @@
 node_modules/
 .env
+.env.production
+.env.local
+.env.production.local
 uploads/temp/*
 !uploads/temp/.gitkeep
 *.log
 .DS_Store
+.vercel

@@ -1,0 +1,8 @@
+Session ID: 3efe1844-6035-4964-9b4d-87ceef5f2bf6
+Language: en
+Confidence Score: 0.92
+Generated: 2026-01-01T14:21:30.627Z
+
+=== TRANSCRIPT ===
+
+This is a mock transcription of the audio file. In production, this would be replaced with actual speech-to-text output from services like OpenAI Whisper, Google Cloud Speech-to-Text, or AWS Transcribe. File: audio.mp3
