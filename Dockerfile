@@ -1,18 +1,20 @@
-FROM node:18-alpine
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy requirements
+COPY requirements-transcription.txt .
 
-# Install dependencies
-RUN npm install
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements-transcription.txt
 
-# Copy the rest of the application
-COPY . .
+# Copy the transcription service
+COPY transcription-service.py .
 
-# Expose port
-EXPOSE 3000
-
-# Start the server
-CMD ["npm", "start"]
+# Run the service
+CMD ["python", "transcription-service.py"]
