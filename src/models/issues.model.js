@@ -35,14 +35,14 @@ export const listIssuesBySession = async (session_id, customer_id) => {
 export const updateIssueById = async (issue_id, customer_id, issue_text) => {
   const result = await pool.query(
     `
-    UPDATE key_issues i
+    UPDATE key_issues
     SET issue_text = $1,
         updated_at = now()
-    FROM sessions s
-    WHERE i.issue_id = $2
-      AND i.session_id = s.session_id
-      AND s.customer_id = $3
-    RETURNING i.*;
+    WHERE issue_id = $2
+      AND session_id IN (
+        SELECT session_id FROM sessions WHERE customer_id = $3
+      )
+    RETURNING *;
     `,
     [issue_text, issue_id, customer_id]
   );
@@ -53,12 +53,12 @@ export const updateIssueById = async (issue_id, customer_id, issue_text) => {
 export const deleteIssueById = async (issue_id, customer_id) => {
   const result = await pool.query(
     `
-    DELETE FROM key_issues i
-    USING sessions s
-    WHERE i.issue_id = $1
-      AND i.session_id = s.session_id
-      AND s.customer_id = $2
-    RETURNING i.*;
+    DELETE FROM key_issues
+    WHERE issue_id = $1
+      AND session_id IN (
+        SELECT session_id FROM sessions WHERE customer_id = $2
+      )
+    RETURNING *;
     `,
     [issue_id, customer_id]
   );
